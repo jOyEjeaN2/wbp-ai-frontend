@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaver</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        :root {
+            --dog-primary: #f6793d;
+            --dog-primary-hover: #e7672a;
+            --dog-secondary: #f4b85f;
+            --dog-bg: #f5f3f0;
+            --dog-card-bg: #ffffff;
+            --dog-brown: #3f2f27;
+            --dog-gray: #666;
+            --dog-border: #e3d9cf;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background-color: var(--dog-bg);
+            color: #222;
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* 헤더 */
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid #e7dfd6;
+            padding: 0.9rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--dog-brown);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            letter-spacing: 0.02em;
+        }
+        .logo::before {
+            content: "🐾";
+            font-size: 1.2rem;
+        }
+
+        .nav-buttons { display: flex; align-items: center; }
+
+        .nav-buttons button {
+            margin-left: 10px;
+            padding: 7px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+            transition: all 0.18s ease;
+        }
+
+        .btn-login {
+            background-color: var(--dog-primary);
+            color: #fff;
+            border-color: var(--dog-primary);
+        }
+        .btn-login:hover {
+            background-color: var(--dog-primary-hover);
+        }
+
+        .btn-logout {
+            background-color: #ffffff;
+            color: var(--dog-brown);
+            border-color: #ddd1c6;
+        }
+        .btn-logout:hover {
+            background-color: #f5f1ec;
+        }
+
+        .profile-container { position: relative; margin-left: 15px; cursor: pointer; }
+
+        .profile-img-header {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #e1d5c9;
+            transition: border-color 0.18s, transform 0.12s;
+        }
+        .profile-img-header:hover {
+            border-color: var(--dog-primary);
+            transform: translateY(-1px);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 44px;
+            right: 0;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 24px rgba(15, 10, 8, 0.16);
+            width: 190px;
+            overflow: hidden;
+            border: 1px solid #e7dbcf;
+            flex-direction: column;
+            z-index: 200;
+        }
+        .dropdown-menu.show { display: flex; }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.18s, color 0.18s;
+            text-align: left;
+            border: none;
+            background: none;
+            width: 100%;
+            display: block;
+            color: #444;
+        }
+        .dropdown-item:hover {
+            background-color: #f7f2ec;
+            color: var(--dog-primary-hover);
+        }
+        .dropdown-divider {
+            border-top: 1px solid #f0e4d8;
+            margin: 0;
+        }
+
+        /* 메인 */
+        main {
+            max-width: 880px;
+            margin: 1.8rem auto 3rem;
+            padding: 0 1rem;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1.2rem;
+        }
+
+        .btn-write {
+            background: var(--dog-primary);
+            color: #fff;
+            padding: 9px 18px;
+            border: none;
+            border-radius: 999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+        }
+        .btn-write::before {
+            content: "✏️";
+            font-size: 0.95rem;
+        }
+        .btn-write:hover {
+            background: var(--dog-primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        /* 게시글 카드 */
+        .post-card {
+            background: var(--dog-card-bg);
+            border-radius: 14px;
+            padding: 1.2rem 1.3rem;
+            margin-bottom: 0.9rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+            border: 1px solid var(--dog-border);
+            transition: box-shadow 0.18s ease, transform 0.12s ease, border-color 0.18s ease;
+            cursor: pointer;
+        }
+        .post-card:hover {
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+            transform: translateY(-1px);
+            border-color: #d7cbbf;
+        }
+        .post-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            color: var(--dog-brown);
+        }
+        .post-content {
+            color: #777;
+            font-size: 0.94rem;
+            margin-bottom: 0.8rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .post-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            color: #a18f7f;
+            font-size: 0.8rem;
+            align-items: center;
+        }
+        .post-author {
+            font-weight: 600;
+            color: var(--dog-gray);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .post-author::before {
+            content: "•";
+            font-size: 0.9rem;
+        }
+        .post-thumbnail {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        /* 페이지네이션 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 1.8rem;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        .btn-page {
+            padding: 6px 12px;
+            border: 1px solid #ddd2c6;
+            background: #fff;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            min-width: 60px;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .btn-page:hover:not(:disabled) {
+            background-color: #f5efe8;
+        }
+        .btn-page:disabled {
+            background: #f0ece7;
+            cursor: not-allowed;
+            color: #b6a89a;
+        }
+
+        /* 모달 공통 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fdfcfb;
+            padding: 1.8rem 1.8rem 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.22);
+            border: 1px solid #e6dbcf;
+        }
+        .close-btn {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #b39b87;
+        }
+        .close-btn:hover { color: var(--dog-brown); }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #ddd2c6;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            margin-bottom: 0.9rem;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+            background-color: #fbfaf8;
+        }
+        .form-input:focus, .form-textarea:focus {
+            border-color: var(--dog-primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(246,121,61,0.16);
+            background-color: #ffffff;
+        }
+        .form-textarea { height: 150px; resize: none; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 11px;
+            background: var(--dog-primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .btn-submit:disabled {
+            background: #ded4cb;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .btn-submit:not(:disabled):hover {
+            background: var(--dog-primary-hover);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transform: translateY(-1px);
+        }
+
+        .btn-delete-account {
+            width: 100%;
+            padding: 11px;
+            background-color: #ffffff;
+            color: #d03b3b;
+            border: 1px solid #f0c1c4;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.18s;
+        }
+        .btn-delete-account:hover {
+            background-color: #ffeef0;
+            border-color: #d03b3b;
+        }
+
+        /* 글쓰기 모달 너비 */
+        #writeModal .modal-content { max-width: 780px; }
+
+        /* 파일 업로드 */
+        .file-upload-wrapper {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .file-upload-label {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #f3ece4;
+            color: #5b4a3d;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: block;
+            transition: all 0.16s;
+            box-sizing: border-box;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+            border: 1px dashed #d7ccbf;
+        }
+        .file-upload-label:hover {
+            background-color: #ece3da;
+        }
+        .file-upload-label.active {
+            background-color: #e3d8cd;
+            border-style: solid;
+        }
+        #postImgInput { display: none; }
+
+        /* AI 툴바 */
+        .ai-toolbar {
+            background: #f1f4fb;
+            padding: 9px 11px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 0.86rem;
+            border: 1px solid #dde3f1;
+            flex-wrap: wrap;
+        }
+        .ai-toolbar span:first-child {
+            font-weight: 600;
+            color: #41506b;
+        }
+        .ai-select {
+            padding: 7px 8px;
+            border-radius: 8px;
+            border: 1px solid #d1d7e6;
+            font-size: 0.85rem;
+            background: white;
+        }
+        .custom-tone-input {
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid #d1d7e6;
+            font-size: 0.84rem;
+            display: none;
+            width: 150px;
+        }
+        .btn-ai {
+            background: #3e63dd;
+            color: white;
+            border: none;
+            padding: 7px 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.16s, transform 0.12s;
+            font-size: 0.84rem;
+        }
+        .btn-ai:hover {
+            background-color: #3251b8;
+            transform: translateY(-1px);
+        }
+        .btn-ai:disabled {
+            background-color: #9ba7d8;
+            cursor: not-allowed;
+        }
+        .btn-restore {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 7px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            font-size: 0.82rem;
+        }
+        .btn-restore:hover { background-color: #565f66; }
+
+        /* AI 모드 버튼 */
+        .ai-mode-btn {
+            border-radius: 999px;
+            border: 1px solid #d1d7e6;
+            background-color: #ffffff;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .ai-mode-btn.active {
+            background-color: #3e63dd;
+            color: #fff;
+            border-color: #3e63dd;
+        }
+
+        /* 검증 메시지 */
+        .error-msg {
+            color: #d03b3b;
+            font-size: 0.78rem;
+            margin-top: -6px;
+            margin-bottom: 7px;
+            padding-left: 2px;
+            display: none;
+        }
+        .success-msg {
+            color: #2f9b4f;
+            font-size: 0.78rem;
+            margin-top: -6px;
+            margin-bottom: 7px;
+            padding-left: 2px;
+            display: none;
+        }
+
+        /* 프로필 */
+        .profile-edit-header {
+            text-align: center;
+            margin-bottom: 1.6rem;
+        }
+        .profile-img-large {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e6dbcf;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: opacity 0.18s, transform 0.12s;
+            background-color: #f5f1eb;
+        }
+        .profile-img-large:hover {
+            opacity: 0.96;
+            transform: translateY(-1px);
+        }
+        .profile-email {
+            color: #8e8174;
+            font-size: 0.86rem;
+            margin-bottom: 4px;
+        }
+        .img-upload-hint {
+            font-size: 0.78rem;
+            color: #b09c84;
+        }
+
+        /* 상세보기 */
+        .detail-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 0.9rem;
+            color: var(--dog-brown);
+        }
+        .detail-img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+            max-height: 520px;
+            object-fit: contain;
+            background-color: #f4eee7;
+        }
+        .detail-info {
+            color: #a08c7a;
+            font-size: 0.86rem;
+            margin-bottom: 1.3rem;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee0d2;
+            padding-bottom: 8px;
+        }
+        .detail-body {
+            font-size: 0.96rem;
+            line-height: 1.8;
+            min-height: 100px;
+            margin-bottom: 1.8rem;
+            white-space: pre-wrap;
+            color: #4b3a31;
+        }
+
+        .detail-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin: 1.6rem 0 2.2rem;
+        }
+
+        .btn-like {
+            background: #fff5ee;
+            color: #c24b3e;
+            border: 1px solid #f1c5aa;
+            padding: 8px 20px;
+            border-radius: 999px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.16s;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .btn-like.active {
+            background: #f34f4f;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(243,79,79,0.45);
+            border-color: #e23a3a;
+        }
+        .btn-like:hover {
+            transform: translateY(-1px);
+        }
+
+        #authorActions { display: none; gap: 8px; }
+
+        .btn-edit-post,
+        .btn-delete-post {
+            padding: 5px 14px;
+            border-radius: 18px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            background-color: #ffffff;
+            transition: all 0.15s;
+        }
+        .btn-edit-post {
+            color: var(--dog-primary);
+            border: 1px solid #ffd0a7;
+        }
+        .btn-edit-post:hover {
+            background-color: #fff7ef;
+        }
+        .btn-delete-post {
+            color: #d03b3b;
+            border: 1px solid #f0c1c4;
+        }
+        .btn-delete-post:hover {
+            background-color: #ffeef0;
+        }
+
+        /* 댓글 */
+        .comment-section {
+            background: #faf6f0;
+            padding: 1.4rem 1.3rem;
+            border-radius: 12px;
+            border: 1px solid #efe0cf;
+        }
+        .comment-header-text {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--dog-brown);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.95rem;
+        }
+        .comment-header-text::before {
+            content: "💬";
+        }
+        .comment-input-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1.2rem;
+        }
+        .comment-input {
+            flex: 1;
+            padding: 9px 12px;
+            border: 1px solid #ddd2c6;
+            border-radius: 999px;
+            background: #ffffff;
+            font-size: 0.9rem;
+        }
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--dog-primary);
+            box-shadow: 0 0 0 2px rgba(246,121,61,0.16);
+        }
+        .btn-comment {
+            background: #222;
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.86rem;
+            white-space: nowrap;
+        }
+        .btn-comment:hover { background: #111; }
+
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .comment-item {
+            background: #ffffff;
+            padding: 11px 12px;
+            border-radius: 10px;
+            border: 1px solid #eee0d2;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+            align-items: center;
+        }
+        .comment-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .comment-author {
+            font-weight: 700;
+            color: #4d3b30;
+        }
+        .comment-date {
+            color: #b19c88;
+            font-size: 0.76rem;
+        }
+        .btn-del-comment {
+            color: #d03b3b;
+            cursor: pointer;
+            font-size: 0.76rem;
+            border: 1px solid #f0c1c4;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #fff;
+        }
+        .btn-del-comment:hover {
+            background: #ffeef0;
+            color: #c32333;
+            border-color: #d03b3b;
+        }
+
+        /* 확인 모달 */
+        #confirmModal { z-index: 2000; }
+        .confirm-box {
+            text-align: center;
+            border-radius: 16px;
+            padding: 1.8rem 1.6rem 2rem;
+            background: #fdfcfb;
+        }
+        .confirm-msg {
+            font-size: 1rem;
+            margin-bottom: 21px;
+            font-weight: 600;
+            color: #4b3a31;
+        }
+        .confirm-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .btn-confirm-yes {
+            background: #d03b3b;
+            color: white;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .btn-confirm-yes:hover { background: #b92f2f; }
+        .btn-confirm-no {
+            background: #f4ece4;
+            color: #5a4a3e;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .btn-confirm-no:hover { background: #e6d7c7; }
+
+        /* 반응형 */
+        @media (max-width: 600px) {
+            header { padding: 0.7rem 1rem; }
+            .logo { font-size: 1.2rem; }
+            .post-card { padding: 1rem; }
+            .comment-input-box { flex-direction: column; }
+            .btn-comment { width: 100%; height: 38px; }
+            .ai-toolbar { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo" onclick="location.reload()">Gaver</div>
+    <div class="nav-buttons" id="navButtons"></div>
+</header>
+
+<main>
+    <div class="action-bar">
+        <button class="btn-write" onclick="openWriteModal()">새 글 쓰기</button>
+    </div>
+    <div id="postList">
+        <div style="text-align:center; padding: 2rem; color:#a18f7f;">
+            꼬리 흔드는 글들을 불러오는 중입니다... 🐕
+        </div>
+    </div>
+    <div class="pagination" id="paginationControls">
+        <button class="btn-page" onclick="changePage(-1)" id="btnPrev">이전</button>
+        <span id="pageIndicator" style="display:flex; align-items:center; font-weight:bold; color:#555;">1</span>
+        <button class="btn-page" onclick="changePage(1)" id="btnNext">다음</button>
+    </div>
+</main>
+
+<div id="confirmModal" class="modal-overlay">
+    <div class="modal-content confirm-box" style="max-width: 380px;">
+        <div id="confirmMessage" class="confirm-msg">정말 삭제하시겠습니까?</div>
+        <div class="confirm-actions">
+            <button class="btn-confirm-no" onclick="closeConfirmModal()">취소</button>
+            <button id="btnRealConfirm" class="btn-confirm-yes">삭제</button>
+        </div>
+    </div>
+</div>
+
+<div id="loginModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
+        <h2 style="text-align:center; margin-bottom:20px;">로그인</h2>
+        <input type="email" id="loginEmail" class="form-input" placeholder="이메일">
+        <div id="loginEmailErrorMsg" class="error-msg">올바른 이메일 형식이 아닙니다. (예: user@example.com)</div>
+        <input type="password" id="loginPassword" class="form-input" placeholder="비밀번호">
+        <div id="loginPwErrorMsg" class="error-msg">비밀번호를 입력해주세요.</div>
+        <button class="btn-submit" onclick="login()">로그인하기</button>
+        <div style="margin-top: 15px; text-align: center; font-size: 0.9rem;">
+            <span onclick="switchToSignup()" style="color: var(--dog-primary); cursor: pointer; font-weight: 500;">
+                회원가입하기
+            </span>
+        </div>
+    </div>
+</div>
+
+<div id="signupModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('signupModal')">&times;</span>
+        <h2 style="text-align:center; margin-bottom:20px;">회원가입</h2>
+        <input type="email" id="signupEmail" class="form-input" placeholder="이메일">
+        <div id="emailErrorMsg" class="error-msg">올바른 이메일 형식이 아닙니다. (예: user@example.com)</div>
+        <input type="text" id="signupNickname" class="form-input" placeholder="닉네임 (10자 이내, 띄어쓰기 금지)">
+        <input type="password" id="signupPassword" class="form-input" placeholder="비밀번호">
+        <div id="pwRuleErrorMsg" class="error-msg">
+            비밀번호는 8~20자, 대문자/소문자/숫자/특수문자를 각각 최소 1개 포함해야 합니다.
+        </div>
+        <div id="pwRuleSuccessMsg" class="success-msg">사용 가능한 비밀번호입니다.</div>
+        <input type="password" id="signupConfirm" class="form-input" placeholder="비밀번호 확인">
+        <div id="pwMatchErrorMsg" class="error-msg">비밀번호가 일치하지 않습니다.</div>
+        <button class="btn-submit" id="btnSignupSubmit" onclick="signup()" disabled>가입하기</button>
+    </div>
+</div>
+
+<div id="profileModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('profileModal')">&times;</span>
+        <div class="profile-edit-header">
+            <img src="https://via.placeholder.com/100?text=DOG" id="profileImgPreview" class="profile-img-large" onclick="document.getElementById('profileImgInput').click()">
+            <input type="file" id="profileImgInput" style="display:none;" accept="image/*" onchange="previewImage(this)">
+            <div class="img-upload-hint">프로필 사진을 눌러 사진을 등록해보세요 🐕</div>
+            <div id="displayEmail" class="profile-email"></div>
+        </div>
+        <label style="font-weight:bold;">닉네임</label>
+        <input type="text" id="editNickname" class="form-input" placeholder="닉네임">
+        <button class="btn-submit" onclick="updateProfile()">정보 수정 완료</button>
+        <button class="btn-delete-account" onclick="deleteUser()">회원 탈퇴</button>
+    </div>
+</div>
+
+<div id="passwordModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('passwordModal')">&times;</span>
+        <h2 style="text-align:center; margin-bottom:20px;">비밀번호 변경</h2>
+        <input type="password" id="newPassword" class="form-input" placeholder="새 비밀번호">
+        <div id="newPwRuleErrorMsg" class="error-msg">
+            비밀번호는 8~20자, 대문자/소문자/숫자/특수문자를 각각 최소 1개 포함해야 합니다.
+        </div>
+        <div id="newPwRuleSuccessMsg" class="success-msg">사용 가능한 비밀번호입니다.</div>
+        <input type="password" id="confirmPassword" class="form-input" placeholder="비밀번호 확인">
+        <div id="newPwMatchErrorMsg" class="error-msg">비밀번호가 일치하지 않습니다.</div>
+        <button class="btn-submit" id="btnUpdatePwSubmit" onclick="updatePassword()" disabled>변경하기</button>
+    </div>
+</div>
+
+<div id="writeModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('writeModal')">&times;</span>
+        <h2 id="writeModalTitle" style="text-align:center; margin-bottom:15px;">게시글 작성</h2>
+
+        <input type="text" id="postTitle" class="form-input" placeholder="제목을 입력하세요 (예: 산책로 추천, 사료 후기)" maxlength="26">
+        <div id="titleErrorMsg" class="error-msg">제목은 최대 26자까지 가능합니다.</div>
+
+        <div class="ai-toolbar">
+            <span>🤖 AI 유형:</span>
+
+            <button type="button" class="ai-mode-btn active" data-mode="tone">톤 변환 (재미)</button>
+            <button type="button" class="ai-mode-btn" data-mode="counsel">고민 상담</button>
+
+            <select id="toneSelect" class="ai-select"></select>
+
+            <input type="text" id="customTone" class="custom-tone-input" placeholder="직접 말투 입력">
+            <button class="btn-ai" onclick="convertAI()">변환 적용</button>
+            <button id="btnRestore" class="btn-restore" onclick="restoreOriginal()">↺ 원문 복구</button>
+        </div>
+
+        <textarea id="postContent" class="form-textarea" placeholder="산책 루트, 간식 추천 등 다양한 내용을 적어보세요. "></textarea>
+
+        <div class="file-upload-wrapper" id="fileUploadSection">
+            <input type="file" id="postImgInput" accept="image/*">
+            <label for="postImgInput" class="file-upload-label" id="postImgLabel">📷 사진 첨부하기</label>
+        </div>
+
+        <div id="writeErrorMsg" class="error-msg">제목과 내용을 모두 작성해주세요.</div>
+
+        <button class="btn-submit" id="btnCreatePost" onclick="submitPost()" disabled>등록하기</button>
+    </div>
+</div>
+
+<div id="detailModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeDetailModal()">&times;</span>
+        <h2 id="dTitle" class="detail-title">제목</h2>
+        <div class="detail-info">
+            <span id="dAuthor" style="font-weight:bold;">작성자</span>
+            <span>
+                <span id="dDate">날짜</span>
+                <span id="dViews" style="margin-left:10px;">조회수 0</span>
+            </span>
+        </div>
+        <img id="dImage" class="detail-img" src="" alt="Post Image">
+        <div id="dContent" class="detail-body">내용</div>
+
+        <div class="detail-actions">
+            <button id="btnLike" class="btn-like" onclick="toggleLike()">
+                ❤️ 좋아요 <span id="dLikes">0</span>
+            </button>
+
+            <div id="authorActions" style="display:none;">
+                <button class="btn-edit-post" onclick="openEditPostMode()">수정</button>
+                <button class="btn-delete-post" onclick="confirmDeletePost()">삭제</button>
+            </div>
+        </div>
+
+        <div class="comment-section">
+            <div class="comment-header-text">댓글</div>
+            <div class="comment-input-box">
+                <input type="text" id="commentInput" class="comment-input" placeholder="댓글로 함께 소통해요 🐶">
+                <button class="btn-comment" onclick="addComment()">등록</button>
+            </div>
+            <div id="commentList" class="comment-list"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = "http://localhost:8000";
+    const DEFAULT_PROFILE_IMG = "https://via.placeholder.com/40?text=DOG";
+    const DEFAULT_LARGE_IMG = "https://via.placeholder.com/100?text=DOG";
+
+    let userToken = localStorage.getItem("access_token");
+    let userId = localStorage.getItem("user_id");
+    let userEmail = localStorage.getItem("user_email");
+    let userNickname = localStorage.getItem("user_nickname");
+
+    let currentPostId = null;
+    let isEditMode = false;
+
+    let currentPage = 1;
+    const pageSize = 10;
+    let hasMorePosts = true;
+    let originalContent = null;
+
+    // 톤 프리셋 그룹
+    const tonePresets = {
+        tone: [ "강아지 시점", "우리집 주인 자랑", "산책 일기" ],
+        counsel: [ "훈련사 설명", "수의사처럼" ]
+    };
+
+    function populateToneSelect(mode) {
+        const select = document.getElementById("toneSelect");
+        if (!select) return;
+        select.innerHTML = "";
+
+        (tonePresets[mode] || []).forEach(t => {
+            const opt = document.createElement("option");
+            opt.value = t;
+            opt.textContent = t;
+            select.appendChild(opt);
+        });
+
+        const customOpt = document.createElement("option");
+        customOpt.value = "custom";
+        customOpt.textContent = "직접 입력";
+        select.appendChild(customOpt);
+
+        toggleCustomToneInput();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        updateNav();
+        loadPosts(1);
+        setupSignupValidation();
+        setupLoginValidation();
+        setupPasswordValidation();
+        setupPostValidation();
+
+        const commentInput = document.getElementById("commentInput");
+        commentInput.addEventListener("keydown", function(event) {
+            if (event.key === "Enter" && !event.isComposing) {
+                event.preventDefault();
+                addComment();
+            }
+        });
+
+        document.getElementById('postImgInput').addEventListener('change', function(e) {
+            const label = document.getElementById('postImgLabel');
+            if (e.target.files && e.target.files[0]) {
+                label.textContent = "📄 " + e.target.files[0].name;
+                label.classList.add('active');
+            } else {
+                // 수정 모드일 때와 아닐 때 텍스트 분기 처리
+                if (isEditMode) {
+                    label.textContent = "📷 기존 이미지 유지 (변경하려면 클릭)";
+                } else {
+                    label.textContent = "📷 사진 첨부하기";
+                }
+                label.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('click', function(event) {
+            const profileContainer = document.querySelector('.profile-container');
+            const dropdown = document.querySelector('.dropdown-menu');
+            if (dropdown && profileContainer && !profileContainer.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        const modeButtons = document.querySelectorAll(".ai-mode-btn");
+        modeButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                modeButtons.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                const mode = btn.dataset.mode;
+                populateToneSelect(mode);
+            });
+        });
+
+        populateToneSelect("tone");
+    });
+
+    let onConfirmAction = null;
+    function showConfirm(msg, callback) {
+        document.getElementById("confirmMessage").innerText = msg;
+        onConfirmAction = callback;
+        document.getElementById("confirmModal").style.display = "flex";
+    }
+    function closeConfirmModal() {
+        document.getElementById("confirmModal").style.display = "none";
+        onConfirmAction = null;
+    }
+    document.getElementById("btnRealConfirm").addEventListener("click", () => {
+        if(onConfirmAction) onConfirmAction();
+        closeConfirmModal();
+    });
+
+    // --- 게시글 수정 모드 열기 ---
+    function openEditPostMode() {
+        isEditMode = true; // 수정 모드 활성화
+
+        // 상세 모달에 있는 데이터를 가져옴
+        const title = document.getElementById("dTitle").innerText;
+        const content = document.getElementById("dContent").innerText;
+
+        // 글쓰기 모달 열기 (초기화 로직 실행됨)
+        openModal("writeModal");
+
+        // 수정 모드 UI 덮어쓰기
+        document.getElementById("writeModalTitle").innerText = "게시글 수정";
+        document.getElementById("btnCreatePost").innerText = "수정하기";
+
+        // 데이터 채워넣기
+        const titleInput = document.getElementById("postTitle");
+        const contentInput = document.getElementById("postContent");
+        titleInput.value = title;
+        contentInput.value = content;
+
+        // 이미지 라벨 수정 (파일 인풋은 비워두고, 라벨만 변경하여 기존 이미지 유지임을 알림)
+        const imgLabel = document.getElementById("postImgLabel");
+        imgLabel.textContent = "📷 기존 이미지 유지 (변경하려면 클릭)";
+        imgLabel.classList.remove('active');
+
+        // [중요] 값을 채워넣은 후 유효성 검사 이벤트를 강제로 발생시켜 버튼을 활성화
+        titleInput.dispatchEvent(new Event('input'));
+        contentInput.dispatchEvent(new Event('input'));
+    }
+
+    // --- 게시글 등록/수정 분기 처리 ---
+    async function submitPost() {
+        if (isEditMode) {
+            await updatePost();
+        } else {
+            await createPost();
+        }
+    }
+
+    // ---  게시글 수정 (FormData 사용) ---
+    async function updatePost() {
+        const title = document.getElementById("postTitle").value;
+        const content = document.getElementById("postContent").value;
+        const fileInput = document.getElementById("postImgInput");
+
+        if(!title || !content) return;
+
+        // 이미지 업로드 가능성을 위해 FormData 사용
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("content", content);
+
+        // 새 이미지가 선택되었을 때만 전송 (선택 안 하면 서버에서 기존 이미지 유지)
+        if (fileInput.files[0]) {
+            formData.append("image", fileInput.files[0]);
+        }
+
+        try {
+            const res = await fetch(`${API_BASE}/posts/${currentPostId}`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${userToken}`
+                    // FormData는 Content-Type을 자동 설정하므로 직접 적지 않음
+                },
+                body: formData
+            });
+            if (res.ok) {
+                alert("게시글이 수정되었습니다.");
+                closeModal("writeModal");
+                // 수정된 내용을 반영하여 상세보기 다시 로드
+                openDetail(currentPostId);
+                // 백그라운드 리스트도 갱신
+                loadPosts(currentPage);
+            } else {
+                const err = await res.json();
+                alert(err.detail || "수정 실패");
+            }
+        } catch(e) {
+            console.error(e);
+            alert("오류 발생");
+        }
+    }
+
+    async function createPost() {
+        const title = document.getElementById("postTitle").value;
+        const content = document.getElementById("postContent").value;
+        const fileInput = document.getElementById("postImgInput");
+
+        if(!title || !content) {
+            document.getElementById("writeErrorMsg").style.display = "block";
+            return;
+        }
+        if(title.length > 26) return;
+
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("content", content);
+        if(fileInput.files[0]) formData.append("image", fileInput.files[0]);
+
+        try {
+            const res = await fetch(`${API_BASE}/posts`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${userToken}` },
+                body: formData
+            });
+            if(res.ok) {
+                alert("등록 완료!");
+                closeModal("writeModal");
+                loadPosts(1);
+            } else throw new Error();
+        } catch(e) { alert("오류 발생"); }
+    }
+
+    async function openDetail(id) {
+        currentPostId = id;
+        try {
+            const res = await fetch(`${API_BASE}/posts/${id}`);
+            if(!res.ok) throw new Error();
+            const post = await res.json();
+            document.getElementById("dTitle").innerText = post.title;
+            document.getElementById("dContent").innerText = post.content;
+            document.getElementById("dAuthor").innerText = `🐕 ${post.author_nickname || '익명 보호자'}`;
+            document.getElementById("dDate").innerText = new Date(post.created_at).toLocaleString();
+            document.getElementById("dViews").innerText = `조회수 ${post.views}`;
+            document.getElementById("dLikes").innerText = post.likes;
+
+            const imgEl = document.getElementById("dImage");
+            if(post.image) {
+                let imgUrl = post.image;
+                if(imgUrl.startsWith("static")) imgUrl = "/" + imgUrl;
+                imgEl.src = API_BASE + imgUrl;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.style.display = 'none';
+            }
+
+            const actions = document.getElementById("authorActions");
+            // 타입 안전성을 위해 String 변환 비교
+            if (userToken && String(post.author_id) === String(userId)) {
+                actions.style.display = 'flex';
+            } else {
+                actions.style.display = 'none';
+            }
+
+            const btnLike = document.getElementById("btnLike");
+            btnLike.classList.remove("active");
+
+            loadComments(id);
+            openModal("detailModal");
+        } catch(e) { alert("글 로드 실패"); }
+    }
+
+    function confirmDeletePost() {
+        showConfirm("정말 게시글을 삭제하시겠습니까?", deletePost);
+    }
+
+    async function deletePost() {
+        try {
+            const res = await fetch(`${API_BASE}/posts/${currentPostId}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${userToken}` }
+            });
+            if(res.ok) {
+                closeDetailModal();
+                loadPosts(currentPage); // 삭제 후 리스트 갱신
+            }
+        } catch(e) { alert("오류 발생"); }
+    }
+
+    async function toggleLike() {
+        if(!userToken) return alert("로그인이 필요합니다.");
+        try {
+            const res = await fetch(`${API_BASE}/posts/${currentPostId}/like`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${userToken}` }
+            });
+            if(res.ok) {
+                const data = await res.json();
+                document.getElementById("dLikes").innerText = data.likes;
+
+                const btnLike = document.getElementById("btnLike");
+                if(data.message.includes("취소")) {
+                    btnLike.classList.remove("active");
+                } else {
+                    btnLike.classList.add("active");
+                }
+            }
+        } catch(e) {}
+    }
+
+    async function loadComments(postId) {
+        try {
+            const res = await fetch(`${API_BASE}/comments/${postId}`);
+            const comments = await res.json();
+            const list = document.getElementById("commentList");
+            if (comments.length === 0) {
+                list.innerHTML = "<div style='color:#a18f7f; text-align:center;'>첫 댓글의 발자국을 남겨보세요 🐾</div>";
+                return;
+            }
+
+            list.innerHTML = comments.map(c => {
+                const date = new Date(c.created_at);
+                const dateStr = `${date.getFullYear()}. ${date.getMonth()+1}. ${date.getDate()}. ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+
+                return `
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <div class="comment-info">
+                            <span class="comment-author">👤 ${c.author_nickname}</span>
+                            <span class="comment-date">${dateStr}</span>
+                        </div>
+                        ${userToken && (String(c.author_id) === String(userId)) ? `<span class="btn-del-comment" onclick="confirmDeleteComment(${c.id})">삭제</span>` : ''}
+                    </div>
+                    <div class="comment-body">${escapeHtml(c.content)}</div>
+                </div>`;
+            }).join('');
+        } catch(e) {}
+    }
+
+    function confirmDeleteComment(cid) {
+        showConfirm("댓글을 삭제하시겠습니까?", () => deleteComment(cid));
+    }
+
+    async function deleteComment(cid) {
+        await fetch(`${API_BASE}/comments/${cid}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${userToken}` }
+        });
+        loadComments(currentPostId);
+    }
+
+    async function addComment() {
+        if(!userToken) return alert("로그인이 필요합니다.");
+        const input = document.getElementById("commentInput");
+        const content = input.value;
+        if(!content) return;
+
+        input.value = "";
+        input.blur();
+
+        try {
+            await fetch(`${API_BASE}/comments/${currentPostId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
+                body: JSON.stringify({ content })
+            });
+            loadComments(currentPostId);
+        } catch(e) {
+            alert("댓글 작성 실패");
+        }
+    }
+
+    function toggleCustomToneInput() {
+        const select = document.getElementById("toneSelect");
+        const input = document.getElementById("customTone");
+        if (!select || !input) return;
+
+        if (select.value === "custom") {
+            input.style.display = "block";
+            input.focus();
+        } else {
+            input.style.display = "none";
+            input.value = "";
+        }
+    }
+
+    function setupPostValidation() {
+        const titleInput = document.getElementById("postTitle");
+        const contentInput = document.getElementById("postContent");
+        const submitBtn = document.getElementById("btnCreatePost");
+        const titleError = document.getElementById("titleErrorMsg");
+        const writeError = document.getElementById("writeErrorMsg");
+        function validatePostForm() {
+            const titleVal = titleInput.value;
+            const contentVal = contentInput.value;
+            let isTitleValid = false;
+            let isContentValid = !!contentVal.trim();
+            if (titleVal.length > 26) {
+                titleError.style.display = "block";
+                titleInput.style.borderColor = "#d03b3b";
+                isTitleValid = false;
+            } else {
+                titleError.style.display = "none";
+                titleInput.style.borderColor = "#ddd2c6";
+                if(titleVal.trim().length > 0) isTitleValid = true;
+            }
+            if (isTitleValid && isContentValid) {
+                submitBtn.disabled = false;
+                writeError.style.display = "none";
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+        titleInput.addEventListener("input", validatePostForm);
+        contentInput.addEventListener("input", validatePostForm);
+    }
+
+    function setupSignupValidation() {
+        const emailInput = document.getElementById("signupEmail");
+        const nickInput = document.getElementById("signupNickname");
+        const pwInput = document.getElementById("signupPassword");
+        const pwConfirm = document.getElementById("signupConfirm");
+        const btnSubmit = document.getElementById("btnSignupSubmit");
+        const emailError = document.getElementById("emailErrorMsg");
+        const pwRuleError = document.getElementById("pwRuleErrorMsg");
+        const pwRuleSuccess = document.getElementById("pwRuleSuccessMsg");
+        const pwMatchError = document.getElementById("pwMatchErrorMsg");
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const pwRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,20}$/;
+        function validateForm() {
+            const emailVal = emailInput.value;
+            const nickVal = nickInput.value;
+            const pwVal = pwInput.value;
+            const confirmVal = pwConfirm.value;
+            let isEmailValid = false, isNickValid = false, isPwValid = false, isMatchValid = false;
+            if (emailVal) {
+                if (emailRegex.test(emailVal)) {
+                    isEmailValid = true;
+                    emailError.style.display = "none";
+                    emailInput.style.borderColor = "#ddd2c6";
+                } else {
+                    emailError.style.display = "block";
+                    emailInput.style.borderColor = "#d03b3b";
+                }
+            } else {
+                emailError.style.display = "none";
+                emailInput.style.borderColor = "#ddd2c6";
+            }
+            if (nickVal && nickVal.trim().length > 0 && nickVal.indexOf(" ") === -1 && nickVal.length <= 10) isNickValid = true;
+            if (pwVal) {
+                if (pwRegex.test(pwVal)) {
+                    isPwValid = true;
+                    pwRuleError.style.display = "none";
+                    pwRuleSuccess.style.display = "block";
+                    pwInput.style.borderColor = "#2f9b4f";
+                } else {
+                    pwRuleError.style.display = "block";
+                    pwRuleSuccess.style.display = "none";
+                    pwInput.style.borderColor = "#d03b3b";
+                }
+            } else {
+                pwRuleError.style.display = "none";
+                pwRuleSuccess.style.display = "none";
+                pwInput.style.borderColor = "#ddd2c6";
+            }
+            if (confirmVal) {
+                if (pwVal === confirmVal) {
+                    isMatchValid = true;
+                    pwMatchError.style.display = "none";
+                    pwConfirm.style.borderColor = "#ddd2c6";
+                } else {
+                    pwMatchError.style.display = "block";
+                    pwConfirm.style.borderColor = "#d03b3b";
+                }
+            } else {
+                pwMatchError.style.display = "none";
+                pwConfirm.style.borderColor = "#ddd2c6";
+            }
+            if (isEmailValid && isNickValid && isPwValid && isMatchValid) btnSubmit.disabled = false;
+            else btnSubmit.disabled = true;
+        }
+        [emailInput, nickInput, pwInput, pwConfirm].forEach(inp => {
+            inp.addEventListener("input", validateForm);
+            inp.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && !btnSubmit.disabled) signup();
+            });
+        });
+    }
+
+    function setupLoginValidation() {
+        const emailInput = document.getElementById("loginEmail");
+        const pwInput = document.getElementById("loginPassword");
+        const emailError = document.getElementById("loginEmailErrorMsg");
+        const pwError = document.getElementById("loginPwErrorMsg");
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        emailInput.addEventListener("input", () => {
+            const val = emailInput.value;
+            if(val && !emailRegex.test(val)) {
+                emailError.style.display = "block";
+                emailInput.style.borderColor = "#d03b3b";
+            } else {
+                emailError.style.display = "none";
+                emailInput.style.borderColor = "#ddd2c6";
+            }
+        });
+        pwInput.addEventListener("input", () => {
+            if(pwInput.value.trim()) {
+                pwError.style.display = "none";
+                pwInput.style.borderColor = "#ddd2c6";
+            }
+        });
+    }
+
+    function setupPasswordValidation() {
+        const pwInput = document.getElementById("newPassword");
+        const pwConfirm = document.getElementById("confirmPassword");
+        const btnSubmit = document.getElementById("btnUpdatePwSubmit");
+        const pwRuleError = document.getElementById("newPwRuleErrorMsg");
+        const pwRuleSuccess = document.getElementById("newPwRuleSuccessMsg");
+        const pwMatchError = document.getElementById("newPwMatchErrorMsg");
+        const pwRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,20}$/;
+        function validatePwForm() {
+            const pwVal = pwInput.value;
+            const confirmVal = pwConfirm.value;
+            let isPwValid = false, isMatchValid = false;
+            if (pwVal) {
+                if (pwRegex.test(pwVal)) {
+                    isPwValid = true;
+                    pwRuleError.style.display = "none";
+                    pwRuleSuccess.style.display = "block";
+                    pwInput.style.borderColor = "#2f9b4f";
+                } else {
+                    pwRuleError.style.display = "block";
+                    pwRuleSuccess.style.display = "none";
+                    pwInput.style.borderColor = "#d03b3b";
+                }
+            } else {
+                pwRuleError.style.display = "none";
+                pwRuleSuccess.style.display = "none";
+                pwInput.style.borderColor = "#ddd2c6";
+            }
+            if (confirmVal) {
+                if (pwVal === confirmVal) {
+                    isMatchValid = true;
+                    pwMatchError.style.display = "none";
+                    pwConfirm.style.borderColor = "#ddd2c6";
+                } else {
+                    pwMatchError.style.display = "block";
+                    pwConfirm.style.borderColor = "#d03b3b";
+                }
+            } else {
+                pwMatchError.style.display = "none";
+                pwConfirm.style.borderColor = "#ddd2c6";
+            }
+            if (isPwValid && isMatchValid) btnSubmit.disabled = false;
+            else btnSubmit.disabled = true;
+        }
+        pwInput.addEventListener("input", validatePwForm);
+        pwConfirm.addEventListener("input", validatePwForm);
+    }
+
+    function switchToSignup() {
+        closeModal('loginModal');
+        openModal('signupModal');
+    }
+
+    function updateNav() {
+        const nav = document.getElementById("navButtons");
+        if (userToken) {
+            let pImg = localStorage.getItem("user_image") || DEFAULT_PROFILE_IMG;
+            if(pImg.startsWith("static")) pImg = API_BASE + "/" + pImg;
+            nav.innerHTML = `
+                <div class="profile-container" onclick="toggleDropdown()">
+                    <img src="${pImg}" class="profile-img-header" alt="Profile">
+                    <div class="dropdown-menu" id="profileDropdown">
+                        <div style="padding:12px 16px; color:#999; font-size:0.8rem;">${userEmail || '로그인 계정'}</div>
+                        <hr class="dropdown-divider">
+                        <button class="dropdown-item" onclick="openProfileModal()">회원정보 수정</button>
+                        <button class="dropdown-item" onclick="openModal('passwordModal')">비밀번호 수정</button>
+                        <hr class="dropdown-divider">
+                        <button class="dropdown-item" style="color:#d03b3b;" onclick="logout()">로그아웃</button>
+                    </div>
+                </div>`;
+        } else {
+            nav.innerHTML = `
+                <button class="btn-login" onclick="openModal('loginModal')">로그인</button>
+                <button class="btn-logout" onclick="openModal('signupModal')">회원가입</button>`;
+        }
+    }
+    function toggleDropdown() {
+        const dd = document.getElementById("profileDropdown");
+        if (dd) dd.classList.toggle("show");
+    }
+
+    function openModal(id) {
+        document.querySelectorAll('.modal-overlay').forEach(m => m.style.display='none');
+
+        if (id === 'writeModal') {
+            // 기본 상태는 '새 글 쓰기'
+            isEditMode = false;
+            document.getElementById("writeModalTitle").innerText = "게시글 작성";
+            document.getElementById("btnCreatePost").innerText = "등록하기";
+            document.getElementById("postTitle").value = "";
+            document.getElementById("postContent").value = "";
+            document.getElementById("postImgInput").value = "";
+            document.getElementById("fileUploadSection").style.display = "block";
+
+            const label = document.getElementById('postImgLabel');
+            label.textContent = "📷 사진 첨부하기";
+            label.classList.remove('active');
+
+            document.getElementById("titleErrorMsg").style.display = "none";
+            document.getElementById("writeErrorMsg").style.display = "none";
+            document.getElementById("btnCreatePost").disabled = true;
+            document.getElementById("postTitle").style.borderColor = "#ddd2c6";
+            originalContent = null;
+            document.getElementById("btnRestore").style.display = "none";
+
+            const modeButtons = document.querySelectorAll(".ai-mode-btn");
+            modeButtons.forEach(b => b.classList.remove("active"));
+            const toneBtn = document.querySelector('.ai-mode-btn[data-mode="tone"]');
+            if (toneBtn) toneBtn.classList.add("active");
+            populateToneSelect("tone");
+        } else if(id === 'signupModal' || id === 'loginModal' || id === 'passwordModal') {
+            const inputs = document.querySelectorAll(`#${id} input`);
+            inputs.forEach(i => { i.value = ''; i.style.borderColor = '#ddd2c6'; });
+            const msgs = document.querySelectorAll(`#${id} .error-msg, #${id} .success-msg`);
+            msgs.forEach(m => m.style.display = 'none');
+            const btn = document.querySelector(`#${id} .btn-submit`);
+            if(btn && id !== 'loginModal') btn.disabled = true;
+        }
+
+        document.getElementById(id).style.display = 'flex';
+    }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function closeDetailModal() { closeModal('detailModal'); loadPosts(currentPage); }
+
+    function openProfileModal() {
+        document.getElementById("displayEmail").innerText = userEmail || "";
+        document.getElementById("editNickname").value = userNickname || "";
+        let pImg = localStorage.getItem("user_image") || DEFAULT_LARGE_IMG;
+        if(pImg.startsWith("static")) pImg = API_BASE + "/" + pImg;
+        document.getElementById("profileImgPreview").src = pImg;
+        document.getElementById("profileImgInput").value = "";
+        openModal('profileModal');
+    }
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) { document.getElementById('profileImgPreview').src = e.target.result; }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    async function loadPosts(page) {
+        currentPage = page;
+        try {
+            const res = await fetch(`${API_BASE}/posts?page=${page}&size=${pageSize}`);
+            const data = await res.json();
+            const posts = data.posts || [];
+            const list = document.getElementById("postList");
+            if(posts.length === 0) {
+                list.innerHTML = `<div style='text-align:center; padding:2rem; color:#a18f7f;'>
+                    ${page === 1 ? '아직 등록된 글이 없습니다. 🐶' : '더 이상 글이 없습니다.'}
+                </div>`;
+                hasMorePosts = false;
+            } else {
+                hasMorePosts = true;
+                list.innerHTML = posts.map(p => {
+                    let thumbHtml = '';
+                    if(p.image && (p.image.startsWith('http') || p.image.startsWith('/'))) {
+                        let imgUrl = p.image;
+                        if(imgUrl.startsWith("static")) imgUrl = "/" + imgUrl;
+                        thumbHtml = `<img src="${API_BASE}${imgUrl}" class="post-thumbnail" style="display:block">`;
+                    }
+                    return `
+                    <div class="post-card" onclick="openDetail(${p.id})">
+                        ${thumbHtml}
+                        <div class="post-title">${escapeHtml(p.title)}</div>
+                        <div class="post-content">${escapeHtml(p.content)}</div>
+                        <div class="post-meta">
+                            <div class="post-author">
+                                <span>${p.author_nickname || '익명 강아지'}</span>
+                            </div>
+                            <span>👀 ${p.views}</span>
+                            <span>❤️ ${p.likes}</span>
+                            <span>💬 ${p.comments_count || 0}</span>
+                            <span>📅 ${new Date(p.created_at).toLocaleDateString()}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+            updatePaginationButtons();
+        } catch(e) { console.error(e); }
+    }
+    function changePage(delta) {
+        const nextPage = currentPage + delta;
+        if(nextPage < 1) return;
+        loadPosts(nextPage);
+    }
+    function updatePaginationButtons() {
+        document.getElementById("pageIndicator").innerText = currentPage;
+        document.getElementById("btnPrev").disabled = (currentPage === 1);
+        const list = document.getElementById("postList");
+        const items = list.getElementsByClassName("post-card");
+        if(!hasMorePosts && items.length === 0) document.getElementById("btnNext").disabled = true;
+        else document.getElementById("btnNext").disabled = false;
+    }
+
+    async function updateProfile() {
+        const nickname = document.getElementById("editNickname").value;
+        const fileInput = document.getElementById("profileImgInput");
+        if(!nickname) return alert("닉네임을 입력해주세요.");
+        const formData = new FormData();
+        formData.append("nickname", nickname);
+        if (fileInput.files[0]) formData.append("profile_image", fileInput.files[0]);
+        try {
+            const res = await fetch(`${API_BASE}/users/${userId}/profile`, {
+                method: "PUT",
+                headers: { "Authorization": `Bearer ${userToken}` },
+                body: formData
+            });
+            if(res.ok) {
+                const data = await res.json();
+                localStorage.setItem("user_nickname", data.updated_nickname);
+                if(data.updated_image) localStorage.setItem("user_image", data.updated_image);
+                userNickname = data.updated_nickname;
+                alert("수정이 완료되었습니다.");
+                closeModal("profileModal");
+                updateNav();
+            } else {
+                const err = await res.json();
+                alert(err.detail || "수정 실패");
+            }
+        } catch(e) { alert("오류가 발생했습니다."); }
+    }
+
+    async function updatePassword() {
+        const password = document.getElementById("newPassword").value;
+        const confirm = document.getElementById("confirmPassword").value;
+        if(!password || !confirm) return;
+        try {
+            const res = await fetch(`${API_BASE}/users/${userId}/password`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userToken}` },
+                body: JSON.stringify({ password, confirm_password: confirm })
+            });
+            if(res.ok) {
+                alert("비밀번호가 변경되었습니다.");
+                closeModal("passwordModal");
+            } else {
+                const err = await res.json();
+                alert(err.detail || "변경 실패");
+            }
+        } catch(e) { alert("오류 발생"); }
+    }
+
+    async function deleteUser() {
+        if(!confirm("정말 탈퇴하시겠습니까? 모든 정보가 삭제되며, 복구할 수 없습니다.")) return;
+        try {
+            const res = await fetch(`${API_BASE}/users/${userId}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${userToken}` }
+            });
+            if(res.ok) {
+                alert("회원 탈퇴가 완료되었습니다.");
+                logout();
+            } else {
+                const err = await res.json();
+                alert(err.detail || "탈퇴 실패");
+            }
+        } catch(e) { alert("오류 발생"); }
+    }
+
+    async function convertAI() {
+        const text = document.getElementById("postContent").value;
+        const toneSelect = document.getElementById("toneSelect");
+        const customInput = document.getElementById("customTone");
+        let tone = toneSelect.value;
+        if (tone === "custom") {
+            tone = customInput.value.trim();
+            if (!tone) return alert("원하는 말투를 입력해주세요!");
+        }
+        if(!text) return alert("내용을 먼저 입력해주세요.");
+
+        if (originalContent === null) originalContent = text;
+
+        const btn = document.querySelector(".btn-ai");
+        const originalText = "변환 적용";
+        btn.innerText = "변환 중...";
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_BASE}/ai_tone/convert`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text, tone })
+            });
+            const data = await res.json();
+            if(data.converted_text) {
+                document.getElementById("postContent").value = data.converted_text;
+                const contentInput = document.getElementById("postContent");
+                contentInput.dispatchEvent(new Event('input'));
+
+                btn.innerText = "완료!";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }, 1500);
+                document.getElementById("btnRestore").style.display = "inline-block";
+            } else {
+                throw new Error("변환 데이터 없음");
+            }
+        } catch(e) {
+            alert("변환에 실패했습니다.");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    function restoreOriginal() {
+        if (originalContent !== null) {
+            document.getElementById("postContent").value = originalContent;
+            originalContent = null;
+            document.getElementById("btnRestore").style.display = "none";
+            document.getElementById("postContent").dispatchEvent(new Event('input'));
+        }
+    }
+
+    async function login() {
+        const emailInput = document.getElementById("loginEmail");
+        const pwInput = document.getElementById("loginPassword");
+        const email = emailInput.value;
+        const password = pwInput.value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        let isValid = true;
+        if(!email || !emailRegex.test(email)) {
+            document.getElementById("loginEmailErrorMsg").style.display = "block";
+            emailInput.style.borderColor = "#d03b3b";
+            isValid = false;
+        }
+        if(!password) {
+            document.getElementById("loginPwErrorMsg").style.display = "block";
+            pwInput.style.borderColor = "#d03b3b";
+            isValid = false;
+        }
+        if(!isValid) return;
+        try {
+            const res = await fetch(`${API_BASE}/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+            if(res.ok) {
+                const data = await res.json();
+                localStorage.setItem("access_token", data.access_token);
+                localStorage.setItem("user_id", data.user_id);
+                localStorage.setItem("user_email", email);
+                userToken = data.access_token;
+                userId = data.user_id;
+                userEmail = email;
+                updateNav();
+                closeModal("loginModal");
+            } else alert("로그인에 실패했습니다.");
+        } catch(e) {}
+    }
+
+    async function signup() {
+        const email = document.getElementById("signupEmail").value;
+        const nickname = document.getElementById("signupNickname").value;
+        const password = document.getElementById("signupPassword").value;
+        const confirm = document.getElementById("signupConfirm").value;
+        if (!email || !nickname || !password || !confirm) return;
+        try {
+            const res = await fetch(`${API_BASE}/auth/signup`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, nickname, password, password_confirm: confirm })
+            });
+            if(res.ok) {
+                alert("가입이 완료되었습니다.");
+                closeModal("signupModal");
+            } else {
+                const err = await res.json();
+                alert(err.detail || "가입 실패");
+            }
+        } catch(e) { alert("오류 발생"); }
+    }
+
+    function logout() {
+        localStorage.clear();
+        userToken=null;
+        updateNav();
+        alert("로그아웃되었습니다.");
+        location.reload();
+    }
+
+    function openWriteModal() {
+        if(!userToken) return alert("로그인이 필요합니다.");
+        openModal("writeModal");
+    }
+
+    function escapeHtml(text) {
+        return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+    }
+</script>
+</body>
+</html>
