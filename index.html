@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaver</title>
+    <title>PawTalk</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <style>
         :root {
@@ -764,7 +764,7 @@
 <body>
 
 <header>
-    <div class="logo" onclick="location.reload()">Gaver</div>
+    <div class="logo" onclick="location.reload()">PawTalk</div>
     <div class="nav-buttons" id="navButtons"></div>
 </header>
 
@@ -931,8 +931,8 @@
 </div>
 
 <script>
-    // const API_BASE = "http://localhost:8000";
-    const API_BASE = "http://172.20.4.84:8000";
+    const API_BASE = "http://localhost:8000";
+    // const API_BASE = "http://172.30.1.93:5500";
 
     const DEFAULT_PROFILE_IMG = "https://via.placeholder.com/40?text=DOG";
     const DEFAULT_LARGE_IMG = "https://via.placeholder.com/100?text=DOG";
@@ -953,7 +953,7 @@
     // 톤 프리셋 그룹
     const tonePresets = {
         tone: [ "강아지 시점", "우리집 주인 자랑", "산책 일기" ],
-        counsel: [ "훈련사 설명", "수의사처럼" ]
+        counsel: [ "훈련사 설명", "수의사 설명" ]
     };
 
     function populateToneSelect(mode) {
@@ -1046,7 +1046,6 @@
 
     // --- 게시글 수정 모드 열기 ---
     function openEditPostMode() {
-        isEditMode = true; // 수정 모드 활성화
 
         // 상세 모달에 있는 데이터를 가져옴
         const title = document.getElementById("dTitle").innerText;
@@ -1054,6 +1053,8 @@
 
         // 글쓰기 모달 열기 (초기화 로직 실행됨)
         openModal("writeModal");
+
+        isEditMode = true; // 수정 모드 활성화
 
         // 수정 모드 UI 덮어쓰기
         document.getElementById("writeModalTitle").innerText = "게시글 수정";
@@ -1088,16 +1089,16 @@
     async function updatePost() {
         const title = document.getElementById("postTitle").value;
         const content = document.getElementById("postContent").value;
-        const fileInput = document.getElementById("postImgInput");
+        const fileInput = document.getElementById("postImgInput"); // 파일 입력창 가져오기
 
-        if(!title || !content) return;
+        if(!title || !content) return alert("제목과 내용을 입력해주세요.");
 
-        // 이미지 업로드 가능성을 위해 FormData 사용
+        // FormData 생성 (이미지 포함 가능)
         const formData = new FormData();
         formData.append("title", title);
         formData.append("content", content);
 
-        // 새 이미지가 선택되었을 때만 전송 (선택 안 하면 서버에서 기존 이미지 유지)
+        // 새 이미지가 선택된 경우에만 추가
         if (fileInput.files[0]) {
             formData.append("image", fileInput.files[0]);
         }
@@ -1107,20 +1108,19 @@
                 method: "PUT",
                 headers: {
                     "Authorization": `Bearer ${userToken}`
-                    // FormData는 Content-Type을 자동 설정하므로 직접 적지 않음
+                    // [중요] FormData 전송 시 Content-Type 헤더는 생략해야 합니다 (브라우저 자동 설정)
                 },
                 body: formData
             });
+
             if (res.ok) {
-                alert("게시글이 수정되었습니다.");
+                alert("게시글이 수정되었습니다!");
                 closeModal("writeModal");
-                // 수정된 내용을 반영하여 상세보기 다시 로드
-                openDetail(currentPostId);
-                // 백그라운드 리스트도 갱신
-                loadPosts(currentPage);
+                openDetail(currentPostId); // 수정된 내용 바로 확인
+                loadPosts(currentPage);    // 목록 갱신
             } else {
                 const err = await res.json();
-                alert(err.detail || "수정 실패");
+                alert(`수정 실패: ${err.detail || '알 수 없는 오류'}`);
             }
         } catch(e) {
             console.error(e);
@@ -1491,14 +1491,33 @@
         openModal('signupModal');
     }
 
+
     function updateNav() {
         const nav = document.getElementById("navButtons");
         if (userToken) {
-            let pImg = localStorage.getItem("user_image") || DEFAULT_PROFILE_IMG;
-            if(pImg.startsWith("static")) pImg = API_BASE + "/" + pImg;
+            let pImg = localStorage.getItem("user_image");
+
+            // [수정된 부분] 이미지 경로 처리 로직 강화
+            if (pImg && pImg !== "null" && pImg !== "undefined") {
+                // 1. http로 시작하면 그대로 사용 (외부 링크)
+                if (pImg.startsWith("http")) {
+                    // pImg = pImg;
+                }
+                // 2. 슬래시(/)로 시작하면 API_BASE를 붙임
+                else if (pImg.startsWith("/")) {
+                    pImg = API_BASE + pImg;
+                }
+                // 3. static이나 uploads로 시작하면 앞에 슬래시와 API_BASE를 붙임
+                else {
+                    pImg = API_BASE + "/" + pImg;
+                }
+            } else {
+                pImg = DEFAULT_PROFILE_IMG; // 이미지가 없으면 기본 이미지
+            }
+
             nav.innerHTML = `
                 <div class="profile-container" onclick="toggleDropdown()">
-                    <img src="${pImg}" class="profile-img-header" alt="Profile">
+                    <img src="${pImg}" class="profile-img-header" alt="Profile" onerror="this.src='${DEFAULT_PROFILE_IMG}'">
                     <div class="dropdown-menu" id="profileDropdown">
                         <div style="padding:12px 16px; color:#999; font-size:0.8rem;">${userEmail || '로그인 계정'}</div>
                         <hr class="dropdown-divider">
@@ -1514,6 +1533,8 @@
                 <button class="btn-logout" onclick="openModal('signupModal')">회원가입</button>`;
         }
     }
+
+
     function toggleDropdown() {
         const dd = document.getElementById("profileDropdown");
         if (dd) dd.classList.toggle("show");
@@ -1565,12 +1586,34 @@
     function openProfileModal() {
         document.getElementById("displayEmail").innerText = userEmail || "";
         document.getElementById("editNickname").value = userNickname || "";
-        let pImg = localStorage.getItem("user_image") || DEFAULT_LARGE_IMG;
-        if(pImg.startsWith("static")) pImg = API_BASE + "/" + pImg;
-        document.getElementById("profileImgPreview").src = pImg;
+
+        let pImg = localStorage.getItem("user_image");
+
+        // [수정된 부분] 이미지 경로 처리 로직 (updateNav와 동일)
+        if (pImg && pImg !== "null" && pImg !== "undefined") {
+            if (pImg.startsWith("http")) {
+                // 외부 링크 유지
+            } else if (pImg.startsWith("/")) {
+                pImg = API_BASE + pImg;
+            } else {
+                pImg = API_BASE + "/" + pImg;
+            }
+        } else {
+            pImg = DEFAULT_LARGE_IMG;
+        }
+
+        const previewImg = document.getElementById("profileImgPreview");
+        previewImg.src = pImg;
+
+        // [추가] 이미지가 깨질 경우 기본 이미지로 대체하는 안전장치
+        previewImg.onerror = function() {
+            this.src = DEFAULT_LARGE_IMG;
+        };
+
         document.getElementById("profileImgInput").value = "";
         openModal('profileModal');
     }
+
     function previewImage(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
