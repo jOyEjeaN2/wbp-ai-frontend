@@ -1,4 +1,4 @@
-## [Gaver Frontend] 
+## [PawTalk Frontend] 
 강아지들의 커뮤니티 **Gaver**의 프론트엔드 프로젝트
 HTML · CSS · JavaScript 기반으로 작성되며 FastAPI 백엔드와 연동됩니다.
 
@@ -19,7 +19,7 @@ python -m http.server 5500
 ```
 http://localhost:5500
 ```
----
+
 ## 🗂️ 프로젝트 구조
 ```
 wbp_frontend/
@@ -30,7 +30,7 @@ wbp_frontend/
 ```
 백엔드와 완전히 독립된 Git 레포로 관리됨.
 
----
+
 ## ✨ 주요 기능
 ### 🐶 1) 게시글 읽기·쓰기
 
