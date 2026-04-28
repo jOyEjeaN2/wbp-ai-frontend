@@ -21,7 +21,7 @@
 
 &nbsp;
 
-## [주요 기능]
+## 주요 기능
 ### 🤖 1. AI 톤 변환 
 사용자가 작성한 문장을 선택한 컨셉에 맞춰 **변환**
 
@@ -40,7 +40,7 @@
 
 &nbsp; 
 
-## [백엔드 연결]
+## 백엔드 연결
 - **백엔드 github** : https://github.com/jOyEjeaN2/wbp-ai-backend
 
 현재 프론트는 다음 주소로 API 요청을 보냄:
@@ -61,7 +61,7 @@ http://localhost:5500
 
 &nbsp;
 
-## [📂 프로젝트 구조]
+## 📂 프로젝트 구조
 ```
 wbp_frontend/
 │── index.html
