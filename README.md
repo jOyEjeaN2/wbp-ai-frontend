@@ -12,6 +12,7 @@ AI를 활용한 강아지 전용 커뮤니티 서비스의 프론트엔드 프�
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
 
+&nbsp;
 
 ## [백엔드 연결]
 - **백엔드 github** : https://github.com/jOyEjeaN2/wbp-ai-backend
@@ -32,6 +33,8 @@ python -m http.server 5500
 http://localhost:5500
 ```
 
+&nbsp;
+
 ## [프로젝트 구조]
 ```
 wbp_frontend/
@@ -42,6 +45,7 @@ wbp_frontend/
 ```
 백엔드와 완전히 독립된 Git 레포로 관리됨.
 
+&nbsp;
 
 ## [주요 기능]
 ### 🐶 1) 게시글 읽기·쓰기
